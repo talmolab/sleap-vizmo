@@ -51,7 +51,8 @@
       "Bash(python -m pytest tests/test_saving_utils.py::TestSaveAllFrames::test_empty_labels -xvs)",
       "Bash(python -m pytest -xvs)",
       "Bash(python -m pytest tests/test_plotting_utils.py::TestPlotInstancePlotly::test_instance_with_skeleton -xvs)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "mcp__serena__read_file"
     ],
     "deny": []
   }
