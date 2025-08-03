@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 import tempfile
 import shutil
-from src.saving_utils import (
+from sleap_vizmo.saving_utils import (
     create_output_directory,
     save_frame_plots,
     save_all_frames,
@@ -90,7 +90,7 @@ class TestSaveFramePlots:
         frame.image = None
         return frame
 
-    @patch("src.saving_utils.create_frame_figure")
+    @patch("sleap_vizmo.saving_utils.create_frame_figure")
     def test_saves_png_and_html(self, mock_create_figure, mock_labeled_frame):
         """Test that both PNG and HTML files are saved."""
         # Mock the figure
@@ -121,7 +121,7 @@ class TestSaveFramePlots:
             )
             mock_fig.write_html.assert_called_once()
 
-    @patch("src.saving_utils.create_frame_figure")
+    @patch("sleap_vizmo.saving_utils.create_frame_figure")
     def test_uses_extracted_video_name(self, mock_create_figure, mock_labeled_frame):
         """Test that video name is extracted when not provided."""
         mock_fig = MagicMock()
@@ -139,8 +139,8 @@ class TestSaveFramePlots:
             assert png_path.name == "test_video_frame_0000.png"
             assert html_path.name == "test_video_frame_0000.html"
 
-    @patch("src.saving_utils.extract_video_name")
-    @patch("src.saving_utils.create_frame_figure")
+    @patch("sleap_vizmo.saving_utils.extract_video_name")
+    @patch("sleap_vizmo.saving_utils.create_frame_figure")
     def test_handles_unknown_video_name(self, mock_create_figure, mock_extract_name):
         """Test handling when video name extraction returns 'unknown'."""
         mock_fig = MagicMock()
@@ -184,8 +184,8 @@ class TestSaveAllFrames:
         labels.labeled_frames = frames
         return labels
 
-    @patch("src.saving_utils.save_frame_plots")
-    @patch("src.saving_utils.save_labels_to_csv")
+    @patch("sleap_vizmo.saving_utils.save_frame_plots")
+    @patch("sleap_vizmo.saving_utils.save_labels_to_csv")
     def test_saves_all_frames(self, mock_save_csv, mock_save_plots, mock_labels):
         """Test that all frames are saved."""
         # Mock return values
@@ -217,7 +217,7 @@ class TestSaveAllFrames:
 
     def test_handles_errors_gracefully(self, mock_labels):
         """Test that errors are handled and reported."""
-        with patch("src.saving_utils.save_frame_plots") as mock_save_plots:
+        with patch("sleap_vizmo.saving_utils.save_frame_plots") as mock_save_plots:
             # Make first frame fail
             mock_save_plots.side_effect = [
                 Exception("Test error"),
@@ -241,12 +241,12 @@ class TestSaveAllFrames:
         def track_progress(current, total, message):
             progress_calls.append((current, total, message))
 
-        with patch("src.saving_utils.save_frame_plots") as mock_save_plots:
+        with patch("sleap_vizmo.saving_utils.save_frame_plots") as mock_save_plots:
             mock_save_plots.side_effect = [
                 (Path(f"frame_{i}.png"), Path(f"frame_{i}.html")) for i in range(3)
             ]
 
-            with patch("src.saving_utils.save_labels_to_csv") as mock_save_csv:
+            with patch("sleap_vizmo.saving_utils.save_labels_to_csv") as mock_save_csv:
                 mock_save_csv.return_value = Path("instances.csv")
 
                 with tempfile.TemporaryDirectory() as temp_dir:

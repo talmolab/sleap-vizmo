@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from unittest.mock import Mock, MagicMock, patch
-from src.data_utils import (
+from sleap_vizmo.data_utils import (
     extract_instance_data,
     export_labels_to_dataframe,
     save_labels_to_csv,
@@ -178,7 +178,7 @@ class TestExportLabelsToDataframe:
 class TestSaveLabelsToCSV:
     """Test suite for save_labels_to_csv function."""
 
-    @patch("src.data_utils.export_labels_to_dataframe")
+    @patch("sleap_vizmo.data_utils.export_labels_to_dataframe")
     def test_basic_save(self, mock_export):
         """Test basic CSV save."""
         # Mock the export function
@@ -209,7 +209,7 @@ class TestSaveLabelsToCSV:
         assert result == output_path
         mock_to_csv.assert_called_once()
 
-    @patch("src.data_utils.export_labels_to_dataframe")
+    @patch("sleap_vizmo.data_utils.export_labels_to_dataframe")
     def test_save_with_metadata(self, mock_export):
         """Test CSV save with metadata in filename."""
         # Mock the export function

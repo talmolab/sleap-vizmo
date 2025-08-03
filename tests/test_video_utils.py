@@ -3,7 +3,11 @@
 import pytest
 from pathlib import Path, WindowsPath, PosixPath
 from unittest.mock import Mock
-from src.video_utils import extract_video_name, parse_video_filename, get_video_info
+from sleap_vizmo.video_utils import (
+    extract_video_name,
+    parse_video_filename,
+    get_video_info,
+)
 
 
 class TestParseVideoFilename:

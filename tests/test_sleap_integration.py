@@ -2,8 +2,12 @@
 
 import pytest
 from pathlib import Path
-from src.video_utils import extract_video_name, get_video_info, parse_video_filename
-from src.data_utils import export_labels_to_dataframe
+from sleap_vizmo.video_utils import (
+    extract_video_name,
+    get_video_info,
+    parse_video_filename,
+)
+from sleap_vizmo.data_utils import export_labels_to_dataframe
 
 
 class TestSLEAPIntegration:

@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 from unittest.mock import Mock, MagicMock
 import plotly.graph_objects as go
-from src.plotting_utils import (
+from sleap_vizmo.plotting_utils import (
     get_color_palette,
     plot_instance_plotly,
     plot_instances_plotly,
