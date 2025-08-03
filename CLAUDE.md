@@ -4,34 +4,57 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a SLEAP (Social LEAP Estimates Animal Poses) annotation project for tracking plant root growth in Medicago plates over time. The project contains labeled data for analyzing primary, lateral, and tertiary root development across a 24-day experimental period.
+SLEAP-Vizmo is an interactive visualization tool for SLEAP (Social LEAP Estimates Animal Poses) annotation files. It provides a modern, web-based interface for exploring pose tracking data using Marimo notebooks and Plotly visualizations.
 
 ## Project Structure
 
 ```
-SLEAP_medicago_plates/
-├── sleap_viz.py              # Main Marimo notebook (run from root)
-├── src/                       # Core utility modules
-│   ├── __init__.py           # Package initialization
+sleap-vizmo/
+├── sleap_viz.py              # Main Marimo notebook application
+├── sleap_vizmo/              # Core package with utility modules
+│   ├── __init__.py           # Package initialization and exports
 │   ├── video_utils.py        # Video metadata extraction utilities
 │   ├── plotting_utils.py     # Plotly visualization functions
-│   └── data_utils.py         # Data export and analysis utilities
-├── tests/                     # Pytest test suite
-│   ├── test_video_utils.py   # Tests for video utilities
+│   ├── data_utils.py         # Data export and analysis utilities
+│   └── saving_utils.py       # Batch export and file management
+├── tests/                    # Comprehensive pytest test suite
+│   ├── conftest.py          # Shared fixtures and test data
+│   ├── test_video_utils.py  # Tests for video utilities
 │   ├── test_plotting_utils.py # Tests for plotting utilities
-│   └── test_data_utils.py    # Tests for data utilities
-├── lateral/                   # Lateral root annotations
-├── primary/                   # Primary root annotations (if present)
-├── tertiary/                  # Tertiary root annotations (if present)
-└── exports/                   # Default export directory for visualizations
+│   ├── test_data_utils.py   # Tests for data utilities
+│   ├── test_saving_utils.py # Tests for saving utilities
+│   ├── test_sleap_integration.py # Integration tests with real data
+│   └── test_button_logic.py # Tests for UI button behavior
+├── .github/workflows/        # CI/CD configuration
+│   ├── ci.yml               # Testing and linting
+│   └── uvpublish.yml        # PyPI publishing
+├── pyproject.toml           # Project configuration and dependencies
+├── LICENSE                  # MIT license
+└── output/                  # Default export directory
 ```
 
-### Key Design Principles
+## Key Design Principles
 
-1. **Modular Architecture**: All functions are in `src/` modules for reusability and testing
-2. **100% Test Coverage**: Comprehensive pytest tests for all utility functions
-3. **Cross-platform Compatibility**: Use `Path.as_posix()` for paths
-4. **Marimo Best Practices**: The notebook imports from `src/` to avoid variable conflicts
+1. **Modular Architecture**: All functions are in `sleap_vizmo/` package for reusability and testing
+2. **High Test Coverage**: Comprehensive pytest tests targeting >90% coverage
+3. **Cross-platform Compatibility**: Use `Path.as_posix()` for paths, handle Windows/Unix differences
+4. **Marimo Best Practices**: The notebook imports from `sleap_vizmo` to avoid variable conflicts
+5. **Type Safety**: Use type hints and handle edge cases (None values, empty data, etc.)
+
+## Import Pattern
+
+**IMPORTANT**: All imports should use the `sleap_vizmo` package name, not `src`:
+
+```python
+# Correct
+from sleap_vizmo.video_utils import extract_video_name
+from sleap_vizmo.plotting_utils import create_frame_figure
+from sleap_vizmo.data_utils import export_labels_to_dataframe
+from sleap_vizmo.saving_utils import save_all_frames
+
+# Incorrect (old pattern - do not use)
+from src.video_utils import extract_video_name  # DON'T DO THIS
+```
 
 ## Marimo Guidelines
 
@@ -109,161 +132,44 @@ To ensure clean execution and maintainability:
 - **Import statements in cells**: When importing modules inside cells (especially in exception handlers), always use unique aliases to avoid variable redefinition errors. For example, use `import traceback as tb_png` in one cell and `import traceback as tb_csv` in another, rather than importing `traceback` in both cells.
 - **Progress tracking**: Use `mo.state()` for mutable values that need to be updated during computation. `mo.md()` objects are immutable and don't have an `update()` method. For progress tracking, create a state object with `progress_state = mo.state([])` and update it with `progress_state.set_value(new_list)`.
 
-## Prerequisites
-
-### Required System Tools
-The organization script requires the `unzip` command to extract zip files:
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install unzip
-
-# CentOS/RHEL/Fedora
-sudo yum install unzip
-# or
-sudo dnf install unzip
-
-# macOS (if using Homebrew)
-brew install unzip
-```
-
 ## Common Commands
 
-### Working with SLEAP
-For SLEAP commands, refer to the official SLEAP documentation at https://sleap.ai/
-
-### Installing Dependencies
+### Development Setup
 ```bash
-# Install uv if not already installed
-pip install uv
+# Create and activate environment
+conda create -n sleap-vizmo-dev python=3.11
+conda activate sleap-vizmo-dev
 
-# Install the project and its dependencies
-uv pip install -e .
-
-# Install dev dependencies (pytest, pytest-cov, black)
-uv pip install -e ".[dev]"
-
-# Or install all dev dependencies with uv sync
-uv sync --dev
+# Install in development mode
+pip install -e ".[dev]"
 ```
 
-### Running the SLEAP Visualizer
+### Running the Visualizer
 ```bash
-# Use the sleap_viz mamba environment
-# Run the interactive SLEAP visualizer from the project root
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m marimo run sleap_viz.py
+# Run the interactive visualizer
+python -m marimo run sleap_viz.py
 
 # Or edit the visualizer interactively
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m marimo edit sleap_viz.py
-
-# For running tests with coverage (pytest options are configured in pyproject.toml)
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m pytest
-
-# Or run specific test files
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m pytest tests/test_video_utils.py -v
-
-# Format code with black (configured in pyproject.toml)
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m black src/ tests/ sleap_viz.py
-
-# Check formatting without making changes
-C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m black src/ tests/ sleap_viz.py --check
+python -m marimo edit sleap_viz.py
 ```
 
-The SLEAP visualizer is a Marimo app that:
-- Loads SLEAP `.slp` files interactively
-- Displays labeled frames with Plotly visualizations
-- Shows hover information with instance numbers and coordinates
-- Displays skeleton connections between body parts
-- Provides a coordinate table for all instances
-- Offers visualization options (toggle image, edges, labels, coloring mode)
-- Contains modular visualization functions within the same file for reusable plotting
-
-### Organizing TIF Files from Google Drive Downloads
+### Testing and Code Quality
 ```bash
-# Organize TIF files from downloaded Google Drive zip files
-# Run this script whenever you download new chunked data from Google Drive
-./organize_tifs.sh
+# Run all tests with coverage
+pytest
 
-# Or specify a custom directory (project name will be extracted from the path)
-./organize_tifs.sh /path/to/your/tifs/ProjectName
+# Run specific test file
+pytest tests/test_video_utils.py -v
 
-# Generate metadata report and check for missing files without reorganizing
-./organize_tifs.sh --metadata-only
+# Format code with black
+black sleap_vizmo tests sleap_viz.py
 
-# The script will:
-# 1. Extract project name from the target directory path
-# 2. Extract any zip files in the directory (unless --metadata-only)
-# 3. Dynamically discover scan days from TIF filenames (e.g., day1, day3, day14, etc.)
-# 4. Create [PROJECT_NAME]_Scans directory with day-based subdirectories
-# 5. Move all TIF files to appropriate day directories (unless --metadata-only)
-# 6. Handle permission issues by copying files when move fails
-# 7. Generate CSV metadata report with file details
-# 8. Check for missing files and report warnings
-# 9. Report final file counts by day
+# Check formatting without changes
+black sleap_vizmo tests sleap_viz.py --check
+
+# Run linting
+ruff check sleap_vizmo/
 ```
-
-### Metadata and File Analysis
-The script generates a comprehensive metadata report saved as `tif_metadata_report.csv` containing:
-- Day number
-- Prefix (F, OG, S, no_peptide1, no_peptide2, no_peptide3)
-- Treatment (Ac, Cp, De, DhA, DhB, DhC, DhD, Fo, Gr, Mt, Ri, Ri1, Ri2, RiA4)
-- Set (set1, set2, set3)
-- Timestamp
-- File number
-- Full file path
-- Filename
-
-The script also performs missing file analysis by:
-- Dynamically discovering scan days from TIF filenames (works with any experimental timeline)
-- Counting files per day
-- Listing unique treatment combinations
-- Warning about days with fewer than 10 files (potential missing data)
-- Identifying missing day directories
-- Adapts to different experimental schedules automatically
-
-## Data Organization
-
-### Directory Structure
-The script dynamically creates directories based on the target directory name:
-```
-tifs/[PROJECT_NAME]/[PROJECT_NAME]_Scans/
-├── Day1_scans_[PROJECT_NAME]/
-├── Day3_scans_[PROJECT_NAME]/
-├── Day6_scans_[PROJECT_NAME]/
-├── Day8_scans_[PROJECT_NAME]/
-├── Day10_scans_[PROJECT_NAME]/
-├── Day14_scans_[PROJECT_NAME]/
-├── Day16_scans_[PROJECT_NAME]/
-├── Day21_scans_[PROJECT_NAME]/
-└── Day24_scans_[PROJECT_NAME]/
-```
-
-For example, with `tifs/MK22/`:
-```
-tifs/MK22/MK22_Scans/
-├── Day1_scans_MK22/
-├── Day3_scans_MK22/
-├── Day6_scans_MK22/
-├── Day8_scans_MK22/
-├── Day10_scans_MK22/
-├── Day14_scans_MK22/
-├── Day16_scans_MK22/
-├── Day21_scans_MK22/
-└── Day24_scans_MK22/
-```
-
-### File Naming Convention
-TIF files follow the pattern: `[Prefix]_[Treatment]_[Set]_[Day]_[Timestamp]_[Number].tif`
-
-- **Prefixes**: F_ (fertilizer), OG_ (organic), S_ (standard)
-- **Days**: Dynamically detected from filenames (e.g., day1, day3, day14, etc.)
-- **Sets**: set1, set2, set3 (experimental replicates)
-
-### Root Type Directories
-Separate folders contain SLEAP annotation files for:
-- Primary root annotations
-- Lateral root annotations  
-- Tertiary root annotations
 
 ## Video Metadata Robustness
 
@@ -294,35 +200,8 @@ When extracting video names from SLEAP labeled frames:
 
 ### Code Formatting
 - The project uses `black` for code formatting with configuration in `pyproject.toml`
-- Run `black src/ tests/ sleap_viz.py` to format all Python files
+- Run `black sleap_vizmo tests sleap_viz.py` to format all Python files
 - Black is included in the dev dependencies
-
-## Recent Updates (August 2025)
-
-### Fixed Video Name Extraction
-- Video name extraction now correctly handles SLEAP's list-of-Path format for filenames
-- Fixed issue where Video objects evaluating to False would return "unknown"
-- Added comprehensive tests for all video filename formats
-
-### Modular Architecture
-- Reorganized code into four core modules in `src/`:
-  - `video_utils.py`: Video metadata extraction
-  - `plotting_utils.py`: Plotly visualization functions  
-  - `data_utils.py`: Data export and analysis
-  - `saving_utils.py`: Automated batch export functionality
-- All functions are fully tested with high coverage
-- Marimo notebook imports from modules to avoid variable conflicts
-
-### Testing Infrastructure
-- Created `tests/conftest.py` with centralized pytest fixtures
-- Added real SLEAP data tests alongside mock tests
-- All tests now pass consistently
-
-### Automated Export System
-- Replaced manual save buttons with a single "Save All" button
-- Exports all labeled frames automatically to a timestamped folder
-- Includes both static (PNG) and interactive (HTML) plots
-- Saves comprehensive CSV summary alongside visualizations
 
 ## Output Saving Guidelines
 
@@ -343,7 +222,7 @@ output/
     ├── video_name_frame_0001.png
     ├── video_name_frame_0001.html
     ├── ...
-    └── video_name_instances.csv
+    └── labels_frames{N}_instances{M}.csv
 ```
 
 The microsecond precision in timestamps ensures unique directory names even for rapid consecutive exports.
@@ -370,3 +249,42 @@ The microsecond precision in timestamps ensures unique directory names even for 
 - Set `hoverinfo="skip"` for edge traces to avoid confusing hover information.
 - Include instance information in hover templates to identify which instance a node belongs to.
 - Format hover templates with HTML tags for clear structure (e.g., `<b>` for headers, `<br>` for line breaks).
+
+## CI/CD Configuration
+
+The project uses GitHub Actions for continuous integration:
+
+### ci.yml
+- Runs on pull requests affecting code files
+- Tests on multiple platforms (Ubuntu, Windows, macOS)
+- Python 3.11 support
+- Runs black formatting check
+- Runs ruff linting
+- Executes full test suite with coverage reporting
+- Uploads coverage to Codecov
+
+### uvpublish.yml
+- Triggers on GitHub releases
+- Publishes to TestPyPI for pre-releases (versions with letters)
+- Publishes to PyPI for stable releases
+- Uses trusted publishing (no tokens needed)
+
+## Recent Updates (January 2025)
+
+### Package Restructuring
+- Migrated from `src/` to `sleap_vizmo/` package structure
+- Updated all imports throughout the codebase
+- Fixed test imports to use new package name
+- Added proper package initialization with `__all__` exports
+
+### CI/CD Setup
+- Added GitHub Actions workflows for testing and publishing
+- Configured black and ruff for code quality
+- Set up automated PyPI publishing
+- Added multi-platform testing support
+
+### Documentation Updates
+- Created user-friendly README with clear sections
+- Removed user-specific paths from documentation
+- Added badges for CI status and PyPI
+- Updated installation and usage instructions
