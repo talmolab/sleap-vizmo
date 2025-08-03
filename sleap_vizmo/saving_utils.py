@@ -151,9 +151,17 @@ def save_all_frames(
 
         # Try to get labels filename if available
         labels_name = "sleap_labels"
+        
+        # Check multiple sources for filename
         if hasattr(labels, "filename") and labels.filename:
+            # Direct filename attribute
             labels_path = Path(labels.filename)
-            labels_name = labels_path.stem  # Get filename without extension
+            labels_name = labels_path.stem
+        elif hasattr(labels, "provenance") and isinstance(labels.provenance, dict):
+            # Check provenance dictionary (where SLEAP typically stores it)
+            if "filename" in labels.provenance and labels.provenance["filename"]:
+                labels_path = Path(labels.provenance["filename"])
+                labels_name = labels_path.stem
 
         # Count total instances
         total_instances = sum(len(lf.instances) for lf in labels.labeled_frames)
