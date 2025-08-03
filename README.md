@@ -1,248 +1,176 @@
-# SLEAP Medicago Plates Visualization & Analysis
+# SLEAP-Vizmo: Interactive SLEAP Visualization with Marimo
+
+[![CI](https://github.com/talmolab/sleap-vizmo/actions/workflows/ci.yml/badge.svg)](https://github.com/talmolab/sleap-vizmo/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/sleap-vizmo)](https://pypi.org/project/sleap-vizmo/)
+[![Python Version](https://img.shields.io/pypi/pyversions/sleap-vizmo)](https://pypi.org/project/sleap-vizmo/)
 
 Interactive visualization and analysis tool for SLEAP (Social LEAP Estimates Animal Poses) annotations. Built with Marimo and Plotly for a modern, interactive experience.
 
-## 🌱 Project Overview
+## 🌟 Features
 
-This project provides tools for visualizing and analyzing SLEAP pose estimation data from time-series experiments tracking primary, lateral, and tertiary root development in Medicago truncatula across a 24-day experimental period. The interactive visualizer enables researchers to explore labeled frames, export publication-ready figures, and analyze root growth patterns.
-
-## 📋 Table of Contents
-
-- [For Users](#-for-users)
-  - [Quick Start](#quick-start)
-  - [Features](#features)
-  - [Usage Guide](#usage-guide)
-  - [Export Options](#export-options)
-- [For Developers](#-for-developers)
-  - [Architecture](#architecture)
-  - [Development Setup](#development-setup)
-  - [Testing](#testing)
-  - [Contributing](#contributing)
-- [Project Structure](#-project-structure)
-- [Data Organization](#-data-organization)
-
----
-
-## 👤 For Users
-
-### Quick Start
-
-1. **Install the environment** (Windows example shown):
-   ```bash
-   # Using mamba/conda
-   mamba create -n sleap_viz python=3.11
-   mamba activate sleap_viz
-   
-   # Install dependencies
-   pip install marimo sleap-io plotly numpy pandas kaleido
-   ```
-
-2. **Run the visualizer**:
-   ```bash
-   # On Windows
-   C:\Users\Elizabeth\miniforge3\envs\sleap_viz\python.exe -m marimo run sleap_viz.py
-   
-   # On Unix/Mac
-   python -m marimo run sleap_viz.py
-   ```
-
-3. **Load your SLEAP file** and start exploring!
-
-### Features
-
-- **📁 Interactive File Loading**: Load SLEAP `.slp` files via text input with real-time validation
+- **📁 Interactive File Loading**: Load SLEAP `.slp` files with real-time validation
 - **📊 Smart Visualization**:
-  - Hover tooltips show node names, instance info, and precise coordinates
+  - Hover tooltips with node names, instance info, and precise coordinates
   - Skeleton connections with proper edge/node separation
   - Multiple coloring modes (by instance, by node, by track)
   - Toggle options for images, edges, labels, and coloring schemes
-- **🎯 Frame Navigation**: Slider to navigate through labeled frames with instant updates
+- **🎯 Frame Navigation**: Slider to navigate through labeled frames
 - **📈 Data Display**: Coordinate table showing all instances with video context
-- **💾 Batch Export System**:
-  - One-click export of all labeled frames
-  - Generates PNG (static) and HTML (interactive) plots
-  - Creates comprehensive CSV with descriptive filename
-  - Organized in timestamped folders
+- **💾 Batch Export**: One-click export of all frames as PNG, HTML, and CSV
 
-### Usage Guide
+## 🚀 Quick Start
 
-1. **Loading Data**:
-   - Enter the path to your `.slp` file in the text input
-   - The app validates the file and displays a summary
-   - Adjust the number of frames to display (default: 10)
-
-2. **Exploring Frames**:
-   - Use the frame slider to navigate
-   - Hover over nodes to see detailed information
-   - Toggle visualization options to focus on specific features
-
-3. **Exporting Results**:
-   - Click "📦 Save All Frames" to export everything
-   - Files are saved to `output/output_YYYYMMDD_HHMMSS_ffffff/`
-   - CSV filename includes: `{labels_file}_frames{N}_instances{M}.csv`
-
-### Export Options
-
-The export system creates:
-- **PNG files**: High-resolution static images (1200x800px, 2x scale)
-- **HTML files**: Interactive Plotly figures with full zoom/pan capabilities
-- **CSV summary**: All instance coordinates with frame and video metadata
-
----
-
-## 💻 For Developers
-
-### Architecture
-
-The project follows a modular architecture with clear separation of concerns:
-
-```
-src/
-├── __init__.py           # Package exports
-├── video_utils.py        # Video metadata extraction
-├── plotting_utils.py     # Plotly visualization functions
-├── data_utils.py         # Data export and analysis
-└── saving_utils.py       # Automated batch export
-```
-
-### Development Setup
-
-1. **Clone and install in development mode**:
-   ```bash
-   git clone <repository>
-   cd SLEAP_medicago_plates
-   
-   # Install with development dependencies
-   pip install -e ".[dev]"
-   
-   # Or using uv
-   uv pip install -e ".[dev]"
-   ```
-
-2. **Install pre-commit hooks** (if using):
-   ```bash
-   pre-commit install
-   ```
-
-### Testing
-
-The project maintains high test coverage with comprehensive test suites:
+### Installation
 
 ```bash
-# Run all tests
-python -m pytest
+# Install from PyPI (when available)
+pip install sleap-vizmo
 
-# Run with coverage
-python -m pytest --cov=src --cov-report=html
-
-# Run specific test modules
-python -m pytest tests/test_plotting_utils.py -v
-
-# Format code before committing
-python -m black src/ tests/ sleap_viz.py
+# Or install from source
+git clone https://github.com/talmolab/sleap-vizmo.git
+cd sleap-vizmo
+pip install -e .
 ```
 
-#### Test Structure
-- `tests/conftest.py` - Shared fixtures and test data
-- `tests/test_video_utils.py` - Video metadata extraction tests
-- `tests/test_plotting_utils.py` - Visualization tests including hover templates
-- `tests/test_data_utils.py` - Data export functionality tests
-- `tests/test_saving_utils.py` - Batch export system tests
+### Running the Visualizer
 
-### Contributing
+```bash
+# Run the interactive visualizer
+python -m marimo run sleap_viz.py
 
-1. **Code Style**:
-   - Use Black for formatting (configured in `pyproject.toml`)
-   - Follow the patterns in CLAUDE.md for Marimo-specific code
-   - Add tests for new functionality
-
-2. **Marimo Best Practices**:
-   - Never redefine variables across cells
-   - Use unique prefixes for cell-specific variables
-   - Access `mo.ui` element values only in downstream cells
-   - Use `mo.ui.run_button()` for action triggers
-
-3. **Pull Request Process**:
-   - Ensure all tests pass
-   - Update documentation as needed
-   - Add your changes to the "Recent Updates" in CLAUDE.md
-
----
-
-## 📂 Project Structure
-
-```
-SLEAP_medicago_plates/
-├── sleap_viz.py          # Main Marimo application
-├── src/                  # Core utility modules
-│   ├── video_utils.py    # Video name extraction, metadata parsing
-│   ├── plotting_utils.py # Plotly figures, hover templates, coloring
-│   ├── data_utils.py     # DataFrame export, CSV generation
-│   └── saving_utils.py   # Batch export, directory management
-├── tests/                # Comprehensive test suite
-│   ├── conftest.py       # Shared fixtures
-│   ├── data/             # Test SLEAP files
-│   └── test_*.py         # Module-specific tests
-├── lateral/              # Lateral root SLEAP annotations
-├── primary/              # Primary root SLEAP annotations
-├── tertiary/             # Tertiary root SLEAP annotations
-├── output/               # Default export directory
-├── CLAUDE.md             # AI assistant guidelines
-├── pyproject.toml        # Project configuration
-└── organize_tifs.sh      # TIF file organization script
+# Or edit the visualizer
+python -m marimo edit sleap_viz.py
 ```
 
----
+## 📋 Usage Guide
 
-## 📊 Data Organization
-
-### SLEAP Files
-- Organized by root type: primary, lateral, tertiary
-- Naming convention: `{root_type}_root_{experiment}_{day}_labels.v{version}.slp`
-
-### TIF Images
-- Organized by experimental day in `tifs/{PROJECT}/`
-- File pattern: `{Prefix}_{Treatment}_{Set}_{Day}_{Timestamp}_{Number}.tif`
-- Use `organize_tifs.sh` to structure downloaded files
+1. **Load your SLEAP file**: Enter the path to your `.slp` file
+2. **Navigate frames**: Use the slider to explore labeled frames
+3. **Customize display**: Toggle visualization options
+4. **Export results**: Click "Save All Frames" to export everything
 
 ### Export Structure
 ```
-output_YYYYMMDD_HHMMSS_ffffff/
-├── {video_name}_frame_0000.png
-├── {video_name}_frame_0000.html
-├── ...
-└── {labels_name}_frames{N}_instances{M}.csv
+output/
+└── output_YYYYMMDD_HHMMSS_ffffff/
+    ├── video_name_frame_0000.png
+    ├── video_name_frame_0000.html
+    ├── ...
+    └── labels_summary.csv
 ```
 
----
+## 💻 Development
 
-## 🔧 Troubleshooting
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/talmolab/sleap-vizmo.git
+cd sleap-vizmo
+
+# Install in development mode with all dependencies
+pip install -e ".[dev]"
+```
+
+### Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=sleap_vizmo --cov-report=html
+
+# Run specific test file
+pytest tests/test_plotting_utils.py -v
+
+# Format code
+black sleap_vizmo tests sleap_viz.py
+
+# Lint code
+ruff check sleap_vizmo/
+```
+
+### Project Structure
+
+```
+sleap-vizmo/
+├── sleap_viz.py              # Main Marimo application
+├── sleap_vizmo/              # Core package
+│   ├── __init__.py
+│   ├── video_utils.py        # Video metadata extraction
+│   ├── plotting_utils.py     # Plotly visualization functions
+│   ├── data_utils.py         # Data export and analysis
+│   └── saving_utils.py       # Batch export functionality
+├── tests/                    # Comprehensive test suite
+│   ├── conftest.py          # Shared fixtures
+│   ├── data/                # Test SLEAP files
+│   └── test_*.py            # Module tests
+├── .github/                 # CI/CD workflows
+│   └── workflows/
+│       ├── ci.yml           # Tests and linting
+│       └── uvpublish.yml    # PyPI publishing
+├── pyproject.toml           # Project configuration
+├── CLAUDE.md                # AI assistant guidelines
+└── README.md                # This file
+```
+
+## 🧪 For Developers
+
+### Architecture
+
+The project follows a modular architecture:
+
+- **`video_utils`**: Handles video metadata extraction from SLEAP files
+- **`plotting_utils`**: Creates Plotly visualizations with proper hover info
+- **`data_utils`**: Exports data to pandas DataFrames and CSV
+- **`saving_utils`**: Manages batch exports and file organization
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and add tests
+4. Ensure tests pass and code is formatted
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Code Style
+
+- Use Black for formatting (configured in `pyproject.toml`)
+- Follow Google-style docstrings
+- Add comprehensive tests for new features
+- Update CLAUDE.md if changing core behavior
+
+## 📊 Data Formats
+
+### Input
+- SLEAP files (`.slp`) containing pose annotations
+- Supports video backends and image sequences
+
+### Output
+- **PNG**: High-resolution static images (1200x800px, 2x scale)
+- **HTML**: Interactive Plotly figures with zoom/pan
+- **CSV**: Instance coordinates with frame and video metadata
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **"AttributeError: '_md' object has no attribute 'update'"**
-   - This occurs with older Marimo versions
-   - Solution: Update Marimo or use the current codebase
-
-2. **Button not triggering**
-   - Ensure you're using `mo.ui.run_button()` not `mo.ui.button()`
-   - Check that you're accessing `.value` in a different cell
-
-3. **Hover shows wrong information**
-   - Update to the latest version which separates edge and node traces
-   - Edges now have `hoverinfo="skip"` to avoid confusion
+1. **Import errors**: Ensure you've installed in development mode: `pip install -e .`
+2. **Marimo errors**: Update to latest version: `pip install --upgrade marimo`
+3. **Export failures**: Check write permissions in the output directory
 
 ### Getting Help
 
-- Check CLAUDE.md for detailed technical guidelines
+- Check [CLAUDE.md](CLAUDE.md) for technical guidelines
 - Review test files for usage examples
-- Open an issue with reproducible steps for bugs
+- Open an [issue](https://github.com/talmolab/sleap-vizmo/issues) for bugs
 
----
+## 📄 License
 
-## 📝 License
-
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -250,3 +178,16 @@ Built with:
 - [SLEAP](https://sleap.ai/) - Animal pose tracking framework
 - [Marimo](https://marimo.io/) - Reactive Python notebooks
 - [Plotly](https://plotly.com/python/) - Interactive visualizations
+
+## 📚 Citation
+
+If you use SLEAP-Vizmo in your research, please cite:
+
+```bibtex
+@software{sleap-vizmo,
+  title = {SLEAP-Vizmo: Interactive SLEAP Visualization with Marimo},
+  author = {Berrigan, Elizabeth},
+  year = {2025},
+  url = {https://github.com/talmolab/sleap-vizmo}
+}
+```
