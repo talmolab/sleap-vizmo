@@ -1,6 +1,6 @@
 # SLEAP Medicago Plates Visualization & Analysis
 
-Interactive visualization and analysis tool for SLEAP (Social LEAP Estimates Animal Poses) annotations, specifically designed for tracking plant root growth in Medicago plates over time. Built with Marimo and Plotly for a modern, interactive experience.
+Interactive visualization and analysis tool for SLEAP (Social LEAP Estimates Animal Poses) annotations. Built with Marimo and Plotly for a modern, interactive experience.
 
 ## 🌱 Project Overview
 
