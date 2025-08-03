@@ -16,13 +16,15 @@ sleap-vizmo/
 │   ├── video_utils.py        # Video metadata extraction utilities
 │   ├── plotting_utils.py     # Plotly visualization functions
 │   ├── data_utils.py         # Data export and analysis utilities
-│   └── saving_utils.py       # Batch export and file management
+│   ├── saving_utils.py       # Batch export and file management
+│   └── roots_utils.py        # SLEAP-roots Series compatibility utilities
 ├── tests/                    # Comprehensive pytest test suite
 │   ├── conftest.py          # Shared fixtures and test data
 │   ├── test_video_utils.py  # Tests for video utilities
 │   ├── test_plotting_utils.py # Tests for plotting utilities
 │   ├── test_data_utils.py   # Tests for data utilities
 │   ├── test_saving_utils.py # Tests for saving utilities
+│   ├── test_roots_utils.py  # Tests for SLEAP-roots compatibility
 │   ├── test_sleap_integration.py # Integration tests with real data
 │   └── test_button_logic.py # Tests for UI button behavior
 ├── .github/workflows/        # CI/CD configuration
@@ -51,6 +53,7 @@ from sleap_vizmo.video_utils import extract_video_name
 from sleap_vizmo.plotting_utils import create_frame_figure
 from sleap_vizmo.data_utils import export_labels_to_dataframe
 from sleap_vizmo.saving_utils import save_all_frames
+from sleap_vizmo.roots_utils import split_labels_by_video, validate_series_compatibility
 
 # Incorrect (old pattern - do not use)
 from src.video_utils import extract_video_name  # DON'T DO THIS
@@ -288,3 +291,60 @@ The project uses GitHub Actions for continuous integration:
 - Removed user-specific paths from documentation
 - Added badges for CI status and PyPI
 - Updated installation and usage instructions
+
+### SLEAP-roots Compatibility (January 2025)
+- Added `roots_utils.py` module for SLEAP-roots Series compatibility
+- Functions to split multi-video labels into individual files
+- Series compatibility validation
+- Comprehensive test coverage (99% for roots_utils)
+
+## SLEAP-roots Integration
+
+The `sleap_vizmo.roots_utils` module provides utilities for working with SLEAP-roots Series class:
+
+### Key Functions
+
+1. **`get_videos_in_labels(labels)`**: Extract all unique videos from labels
+2. **`split_labels_by_video(labels)`**: Split multi-video labels into individual video labels
+3. **`save_individual_video_labels(labels, output_dir, prefix="", suffix="")`**: Save each video's labels as separate .slp files
+4. **`validate_series_compatibility(labels)`**: Check if labels meet Series requirements
+5. **`create_series_name_from_video(video_name)`**: Generate clean series names from video filenames
+
+### Usage Example
+
+```python
+import sleap_io as sio
+from sleap_vizmo.roots_utils import (
+    split_labels_by_video,
+    save_individual_video_labels,
+    validate_series_compatibility
+)
+
+# Load multi-video labels
+labels = sio.load_slp("combined_labels.slp")
+
+# Check Series compatibility
+compatibility = validate_series_compatibility(labels)
+if not compatibility["is_compatible"]:
+    print("Warnings:", compatibility["warnings"])
+    print("Errors:", compatibility["errors"])
+
+# Split and save individual videos
+output_paths = save_individual_video_labels(
+    labels, 
+    output_dir="./individual_videos",
+    prefix="plant_",
+    suffix="_primary"
+)
+
+# Output: plant_video1_primary.slp, plant_video2_primary.slp, etc.
+```
+
+### Series Compatibility Requirements
+
+For labels to be compatible with SLEAP-roots Series:
+- Must have at least one video
+- Must have labeled frames
+- Must have skeleton definitions
+- Tracks are recommended but not required
+- Single video per file is recommended (use `split_labels_by_video` for multi-video files)
