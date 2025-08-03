@@ -1,5 +1,7 @@
 """SLEAP visualization utilities package."""
 
+__version__ = "0.1.0"  # Update this version as needed
+
 from .video_utils import extract_video_name, parse_video_filename, get_video_info
 from .plotting_utils import (
     get_color_palette,
