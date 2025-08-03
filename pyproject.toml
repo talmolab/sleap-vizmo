@@ -1,9 +1,16 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "sleap-visualizer"
-version = "0.1.0"
+name = "sleap-vizmo"
+authors=[
+    {name = "Elizabeth Berrigan", email = "eberrigan@salk.edu"}
+]
 description = "Interactive SLEAP file visualizer using Marimo and Plotly"
 readme = "README.md"
 requires-python = ">=3.8"
+dynamic = ["version"]
 dependencies = [
     "marimo>=0.9.0",
     "sleap-io>=0.2.0",
@@ -20,33 +27,24 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "black>=23.7.0",
+    "ruff>=0.1.0",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.setuptools.dynamic]
+version = {attr = "sleap_vizmo.__version__"}
 
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
-
-[tool.uv]
-dev-dependencies = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "black>=23.7.0",
-]
+[tool.setuptools]
+packages = ["sleap_vizmo"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "-v --cov=src --cov-report=html --cov-report=term-missing"
+addopts = "-v --cov=sleap_vizmo --cov-report=html --cov-report=term-missing"
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311']
-include = '\.pyi?$'
 extend-exclude = '''
 /(
   # directories
@@ -60,3 +58,15 @@ extend-exclude = '''
   | dist
 )/
 '''
+[tool.ruff.lint]
+select = [
+    "D",  # pydocstyle
+]
+ignore = [
+    "D212",  # Multi-line docstring summary should start at the first line
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
