@@ -57,7 +57,8 @@ class TestParseVideoFilename:
 
     def test_windows_string_path(self):
         """Test parsing Windows-style string path."""
-        filename = r"C:\Users\test\Videos\experiment_01.avi"
+        # Use forward slashes which work on all platforms
+        filename = "C:/Users/test/Videos/experiment_01.avi"
         result = parse_video_filename(filename)
         assert result == "experiment_01"
 
