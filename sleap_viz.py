@@ -16,7 +16,7 @@ def _():
     from datetime import datetime
 
     # Import our custom modules
-    from src import (
+    from sleap_vizmo import (
         extract_video_name,
         get_video_info,
         create_frame_figure,
