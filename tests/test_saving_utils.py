@@ -274,18 +274,17 @@ class TestSaveAllFrames:
             # CSV should still be created (even if empty)
             assert results["csv_file"] is not None
 
-
     @patch("sleap_vizmo.saving_utils.save_frame_plots")
     @patch("sleap_vizmo.saving_utils.save_labels_to_csv")
     def test_csv_filename_from_provenance(self, mock_save_csv, mock_save_plots):
         """Test CSV filename generation using provenance."""
         labels = Mock()
         labels.labeled_frames = []
-        
+
         # Case 1: Using provenance (like real SLEAP files)
         labels.provenance = {"filename": "tests/data/my_experiment_v003.slp"}
         labels.filename = None  # No direct filename attribute
-        
+
         # Add some mock frames with instances
         for i in range(2):
             frame = Mock()
@@ -294,27 +293,27 @@ class TestSaveAllFrames:
             frame.video.filename = "test.mp4"
             frame.image = None
             labels.labeled_frames.append(frame)
-        
+
         # Mock the save functions
         mock_save_plots.side_effect = [
             (Path(f"frame_{i}.png"), Path(f"frame_{i}.html")) for i in range(2)
         ]
         mock_save_csv.return_value = Path("dummy.csv")  # We'll check the call args
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
             results = save_all_frames(labels, base_dir=temp_dir)
-            
+
             # Check that save_labels_to_csv was called with the right filename
             call_args = mock_save_csv.call_args
             csv_path = call_args[0][1]  # Second argument is the output path
-            
+
             # Check CSV filename includes the labels name from provenance
             csv_name = csv_path.name
             assert "my_experiment_v003" in csv_name
             assert "frames2" in csv_name
             assert "instances6" in csv_name  # 2 frames * 3 instances
             assert csv_name.endswith(".csv")
-    
+
     @patch("sleap_vizmo.saving_utils.save_frame_plots")
     @patch("sleap_vizmo.saving_utils.save_labels_to_csv")
     def test_csv_filename_from_direct_attribute(self, mock_save_csv, mock_save_plots):
@@ -323,7 +322,7 @@ class TestSaveAllFrames:
         labels.labeled_frames = []
         labels.filename = "/path/to/direct_filename_test.slp"
         labels.provenance = None  # No provenance
-        
+
         # Add a mock frame with instances
         frame = Mock()
         frame.instances = [Mock(), Mock()]
@@ -331,24 +330,24 @@ class TestSaveAllFrames:
         frame.video.filename = "test.mp4"
         frame.image = None
         labels.labeled_frames.append(frame)
-        
+
         # Mock the save functions
         mock_save_plots.return_value = (Path("frame_0.png"), Path("frame_0.html"))
         mock_save_csv.return_value = Path("dummy.csv")
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
             results = save_all_frames(labels, base_dir=temp_dir)
-            
+
             # Check that save_labels_to_csv was called with the right filename
             call_args = mock_save_csv.call_args
             csv_path = call_args[0][1]
-            
+
             # Check CSV filename uses direct filename
             csv_name = csv_path.name
             assert "direct_filename_test" in csv_name
             assert "frames1" in csv_name
             assert "instances2" in csv_name
-    
+
     @patch("sleap_vizmo.saving_utils.save_frame_plots")
     @patch("sleap_vizmo.saving_utils.save_labels_to_csv")
     def test_csv_filename_fallback(self, mock_save_csv, mock_save_plots):
@@ -358,30 +357,31 @@ class TestSaveAllFrames:
         # No filename or provenance
         labels.filename = None
         labels.provenance = None
-        
+
         frame = Mock()
         frame.instances = [Mock()]
         frame.video = Mock()
         frame.video.filename = "test.mp4"
         frame.image = None
         labels.labeled_frames.append(frame)
-        
+
         # Mock the save functions
         mock_save_plots.return_value = (Path("frame_0.png"), Path("frame_0.html"))
         mock_save_csv.return_value = Path("dummy.csv")
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
             results = save_all_frames(labels, base_dir=temp_dir)
-            
+
             # Check that save_labels_to_csv was called with the right filename
             call_args = mock_save_csv.call_args
             csv_path = call_args[0][1]
-            
+
             # Should use fallback name
             csv_name = csv_path.name
             assert "sleap_labels" in csv_name
             assert "frames1" in csv_name
             assert "instances1" in csv_name
+
 
 class TestIntegration:
     """Integration tests with real SLEAP data."""
