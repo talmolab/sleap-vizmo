@@ -90,8 +90,8 @@ def combine_labels_from_configs(file_configs: List[Dict]) -> Optional[sio.Labels
         labels = config["labels"]
 
         # Get skeleton from first valid labels
-        if skeleton is None and labels.skeleton:
-            skeleton = labels.skeleton
+        if skeleton is None and hasattr(labels, "skeletons") and labels.skeletons:
+            skeleton = labels.skeletons[0]
 
         # Collect all labeled frames
         all_labeled_frames.extend(labels.labeled_frames)
