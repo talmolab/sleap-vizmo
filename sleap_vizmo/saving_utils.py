@@ -164,7 +164,11 @@ def save_all_frames(
                 labels_name = labels_path.stem
 
         # Count total instances
-        total_instances = sum(len(lf.instances) for lf in labels.labeled_frames)
+        total_instances = 0
+        if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None:
+            for lf in labels.labeled_frames:
+                if hasattr(lf, "instances") and lf.instances is not None:
+                    total_instances += len(lf.instances)
 
         # Create descriptive filename
         csv_filename = f"{labels_name}_frames{n_frames}_instances{total_instances}.csv"

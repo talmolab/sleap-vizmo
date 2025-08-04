@@ -94,17 +94,20 @@ def combine_labels_from_configs(file_configs: List[Dict]) -> Optional[sio.Labels
             skeleton = labels.skeleton
 
         # Collect all labeled frames
-        all_labeled_frames.extend(labels.labeled_frames)
+        if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None:
+            all_labeled_frames.extend(labels.labeled_frames)
 
         # Collect unique videos
-        for video in labels.videos:
-            if video not in all_videos:
-                all_videos.append(video)
+        if hasattr(labels, "videos") and labels.videos is not None:
+            for video in labels.videos:
+                if video not in all_videos:
+                    all_videos.append(video)
 
         # Collect unique tracks
-        for track in labels.tracks:
-            if track not in all_tracks:
-                all_tracks.append(track)
+        if hasattr(labels, "tracks") and labels.tracks is not None:
+            for track in labels.tracks:
+                if track not in all_tracks:
+                    all_tracks.append(track)
 
     if not all_labeled_frames:
         return None

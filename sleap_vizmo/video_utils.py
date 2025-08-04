@@ -30,7 +30,7 @@ def extract_video_name(labeled_frame: Any) -> str:
     filename = None
 
     # Try direct filename attribute first
-    if hasattr(labeled_frame.video, "filename"):
+    if hasattr(labeled_frame.video, "filename") and labeled_frame.video.filename is not None:
         filename = labeled_frame.video.filename
     # Try backend.filename as fallback
     elif hasattr(labeled_frame.video, "backend") and hasattr(

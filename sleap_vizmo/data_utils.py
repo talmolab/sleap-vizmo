@@ -38,6 +38,11 @@ def extract_instance_data(
     # Process each instance
     for instance_idx, instance in enumerate(labeled_frame.instances):
         instance_points = instance.numpy()
+        
+        # Skip if numpy() returns None
+        if instance_points is None:
+            continue
+            
         instance_skeleton = instance.skeleton
         instance_node_names = [node.name for node in instance_skeleton.nodes]
 
@@ -153,10 +158,10 @@ def summarize_labels(labels: Any) -> Dict[str, Any]:
         Dictionary with summary statistics
     """
     summary = {
-        "n_videos": len(labels.videos) if hasattr(labels, "videos") else 0,
-        "n_skeletons": len(labels.skeletons) if hasattr(labels, "skeletons") else 0,
+        "n_videos": len(labels.videos) if hasattr(labels, "videos") and labels.videos is not None else 0,
+        "n_skeletons": len(labels.skeletons) if hasattr(labels, "skeletons") and labels.skeletons is not None else 0,
         "n_labeled_frames": (
-            len(labels.labeled_frames) if hasattr(labels, "labeled_frames") else 0
+            len(labels.labeled_frames) if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None else 0
         ),
         "n_tracks": (
             len(labels.tracks)
@@ -171,7 +176,7 @@ def summarize_labels(labels: Any) -> Dict[str, Any]:
     }
 
     # Get video names
-    if hasattr(labels, "videos"):
+    if hasattr(labels, "videos") and labels.videos is not None:
         for video in labels.videos:
             # Create a mock labeled frame with the video for extraction
             mock_lf = type("obj", (object,), {"video": video})()
@@ -179,23 +184,24 @@ def summarize_labels(labels: Any) -> Dict[str, Any]:
             summary["video_names"].append(video_name)
 
     # Get skeleton info
-    if hasattr(labels, "skeletons"):
+    if hasattr(labels, "skeletons") and labels.skeletons is not None:
         for i, skeleton in enumerate(labels.skeletons):
             if hasattr(skeleton, "nodes"):
                 summary["nodes_per_skeleton"][f"skeleton_{i}"] = len(skeleton.nodes)
 
     # Analyze labeled frames
-    if hasattr(labels, "labeled_frames"):
+    if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None:
         for lf in labels.labeled_frames:
             n_instances = len(lf.instances) if hasattr(lf, "instances") else 0
             summary["instances_per_frame"].append(n_instances)
             summary["total_instances"] += n_instances
 
             # Count valid points
-            for instance in lf.instances:
-                pts = instance.numpy()
-                valid_pts = ~np.isnan(pts).any(axis=1)
-                summary["total_points"] += np.sum(valid_pts)
+            if hasattr(lf, "instances") and lf.instances is not None:
+                for instance in lf.instances:
+                    pts = instance.numpy()
+                    valid_pts = ~np.isnan(pts).any(axis=1)
+                    summary["total_points"] += np.sum(valid_pts)
 
     # Calculate statistics
     if summary["instances_per_frame"]:

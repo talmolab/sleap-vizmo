@@ -20,7 +20,7 @@ def get_videos_in_labels(labels: Labels) -> List[Tuple[str, Video]]:
     """
     videos = []
 
-    if hasattr(labels, "videos") and labels.videos:
+    if hasattr(labels, "videos") and labels.videos is not None:
         for video in labels.videos:
             # Create a mock labeled frame to use extract_video_name
             mock_lf = type("obj", (object,), {"video": video})()
@@ -75,7 +75,7 @@ def split_labels_by_video(labels: Labels) -> Dict[str, Labels]:
 
         # Filter labeled frames for this video
         video_frames = []
-        if hasattr(labels, "labeled_frames"):
+        if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None:
             for lf in labels.labeled_frames:
                 if hasattr(lf, "video") and lf.video == video:
                     video_frames.append(lf)
@@ -198,7 +198,7 @@ def validate_series_compatibility(labels: Labels) -> Dict[str, Any]:
 
     # Check video references in frames
     frames_without_video = 0
-    if hasattr(labels, "labeled_frames"):
+    if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None:
         for lf in labels.labeled_frames:
             if not hasattr(lf, "video") or lf.video is None:
                 frames_without_video += 1
