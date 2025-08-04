@@ -28,6 +28,12 @@ def _():
         get_videos_in_labels,
         split_labels_by_video,
         create_series_name_from_video,
+        # Pipeline detection utilities
+        detect_root_types,
+        get_compatible_pipelines,
+        combine_labels_from_configs,
+        get_file_summary,
+        validate_file_config,
     )
 
     return (
@@ -40,6 +46,11 @@ def _():
         save_all_frames,
         sleap_io,
         summarize_labels,
+        detect_root_types,
+        get_compatible_pipelines,
+        combine_labels_from_configs,
+        get_file_summary,
+        validate_file_config,
     )
 
 
@@ -230,7 +241,7 @@ def _(file_configs, mo, summarize_labels):
 
 
 @app.cell
-def _(file_configs, mo):
+def _(file_configs, mo, combine_labels_from_configs):
     # Initialize all variables at the top
     frame_selector = None
     show_image_toggle = None
@@ -240,9 +251,9 @@ def _(file_configs, mo):
     controls_panel = None
     viz_labels = None
 
-    # Use the first file for visualization
-    if file_configs and len(file_configs) > 0:
-        viz_labels = file_configs[0]["labels"]
+    # Combine labels from all loaded files
+    if file_configs:
+        viz_labels = combine_labels_from_configs(file_configs)
 
     if viz_labels and len(viz_labels.labeled_frames) > 0:
         frame_selector = mo.ui.slider(
@@ -259,8 +270,12 @@ def _(file_configs, mo):
         show_labels_toggle = mo.ui.checkbox(value=True, label="Show node labels")
         color_by_node_toggle = mo.ui.checkbox(value=False, label="Color by node")
 
+        # Get summary of combined files
+        combined_summary = f"**Combined visualization from {len(file_configs)} file(s)**"
+        
         controls_panel = mo.vstack(
             [
+                mo.md(combined_summary),
                 mo.md(
                     f"### Frame Navigation ({len(viz_labels.labeled_frames)} frames available)"
                 ),
@@ -421,12 +436,9 @@ def _(viz_labels, mo):
 
 
 @app.cell
-def _(mo, file_configs):
-    # Determine root types from loaded files
-    root_types = {"primary": False, "lateral": False, "crown": False}
-
-    for root_type_config in file_configs:
-        root_types[root_type_config["root_type"]] = True
+def _(mo, file_configs, detect_root_types):
+    # Use the tested function to determine root types
+    root_types = detect_root_types(file_configs)
 
     # Display detected root types
     if file_configs:
@@ -496,43 +508,12 @@ def _(viz_labels, mo, save_all_button, save_all_frames):
     return
 
 
-@app.cell
-def _(mo, root_types):
-    # Determine compatible pipelines based on detected root types
-    compatible_pipelines = []
+@app.cell  
+def _(mo, root_types, file_configs, get_compatible_pipelines):
+    # Use the tested function to determine compatible pipelines
+    compatible_pipelines = get_compatible_pipelines(root_types)
     pipeline_selector = None
     pipeline_section = mo.md("")  # Default empty
-
-    # Check for multiple primary roots case
-    has_multiple_primary = False
-    # TODO: Check if any file has multiple plants/instances to suggest MultiplePrimaryPipeline
-
-    # Determine compatible pipelines based on root type combination
-    if root_types["primary"] and not root_types["lateral"] and not root_types["crown"]:
-        compatible_pipelines = [
-            ("PrimaryRootPipeline", "Primary root analysis"),
-            # Note: PrimaryRootPipeline can handle multiple primary roots
-            # using compute_multiple_dicots_traits() method
-        ]
-    elif (
-        root_types["lateral"] and not root_types["primary"] and not root_types["crown"]
-    ):
-        compatible_pipelines = [("LateralRootPipeline", "Lateral roots only")]
-    elif root_types["primary"] and root_types["lateral"] and not root_types["crown"]:
-        compatible_pipelines = [
-            ("DicotPipeline", "Single dicot plant (primary + lateral)"),
-            ("MultipleDicotPipeline", "Multiple dicot plants (primary + lateral)"),
-        ]
-    elif (
-        root_types["crown"] and not root_types["primary"] and not root_types["lateral"]
-    ):
-        compatible_pipelines = [
-            ("OlderMonocotPipeline", "Older monocot (crown roots only)")
-        ]
-    elif root_types["primary"] and root_types["crown"] and not root_types["lateral"]:
-        compatible_pipelines = [
-            ("YoungerMonocotPipeline", "Young monocot (primary + crown)")
-        ]
 
     if compatible_pipelines:
         # Create pipeline selector
