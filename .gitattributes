@@ -1,0 +1,90 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files should always use LF line endings
+*.py text eol=lf
+*.pyx text eol=lf
+*.pxd text eol=lf
+
+# Jupyter notebooks
+*.ipynb text eol=lf
+
+# Shell scripts must have LF endings
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Batch files must have CRLF endings
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Configuration files
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.rst text eol=lf
+*.txt text eol=lf
+LICENSE text eol=lf
+README text eol=lf
+
+# Web files
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Git files
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitmodules text eol=lf
+
+# Binary files (should not be modified)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.slp binary
+*.h5 binary
+*.npy binary
+*.npz binary
+*.pkl binary
+*.pickle binary
+*.pyc binary
+*.pyo binary
+*.pyd binary
+*.so binary
+*.dylib binary
+*.dll binary
+*.exe binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.7z binary
+*.rar binary
+
+# Data files
+*.csv text eol=lf
+*.tsv text eol=lf
+*.parquet binary
+*.feather binary
+
+# Video files
+*.mp4 binary
+*.avi binary
+*.mov binary
+*.mkv binary
+*.webm binary
+
+# Font files
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary

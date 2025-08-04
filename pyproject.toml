@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sleap-vizmo"
+authors=[
+    {name = "Elizabeth Berrigan", email = "eberrigan@salk.edu"}
+]
+description = "Interactive SLEAP file visualizer using Marimo and Plotly"
+readme = "README.md"
+requires-python = ">=3.8"
+dynamic = ["version"]
+dependencies = [
+    "marimo>=0.9.0",
+    "sleap-io>=0.2.0",
+    "plotly>=5.18.0",
+    "numpy>=1.21.0",
+    "pillow>=10.0.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+    "kaleido",
+    "sleap-roots",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "ruff>=0.1.0",
+    "nbconvert>=7.0.0",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "sleap_vizmo.__version__"}
+
+[tool.setuptools]
+packages = ["sleap_vizmo"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=sleap_vizmo --cov-report=html --cov-report=term-missing"
+
+[tool.black]
+line-length = 88
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+[tool.ruff.lint]
+select = [
+    "D",  # pydocstyle
+]
+ignore = [
+    "D212",  # Multi-line docstring summary should start at the first line
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
