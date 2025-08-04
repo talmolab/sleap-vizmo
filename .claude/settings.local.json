@@ -64,7 +64,10 @@
       "Bash(C:/miniforge3/envs/sleap-vizmo-dev/python.exe -m black sleap_viz.py)",
       "Bash(C:/miniforge3/envs/sleap-vizmo-dev/python.exe -m pytest tests/ -v --tb=short)",
       "Bash(C:miniforge3envssleap-vizmo-devpython.exe -m pytest tests/ -v)",
-      "mcp__serena__insert_at_line"
+      "mcp__serena__insert_at_line",
+      "Bash(claude doctor)",
+      "Bash(npm i:*)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }
