@@ -166,7 +166,17 @@ def _(mo):
 
 
 @app.cell
-def _(Path, mo, sleap_io, file1_path, file1_root_type, file2_path, file2_root_type, file3_path, file3_root_type):
+def _(
+    Path,
+    mo,
+    sleap_io,
+    file1_path,
+    file1_root_type,
+    file2_path,
+    file2_root_type,
+    file3_path,
+    file3_root_type,
+):
     # Collect and validate file inputs
     file_configs = []
     validation_messages = []
@@ -231,11 +241,11 @@ def _(file_configs, mo, summarize_labels):
             summary_text += f"- Labeled frames: {summary['n_labeled_frames']}\n"
             summary_text += f"- Total instances: {summary['total_instances']}\n"
             summaries.append(summary_text)
-        
+
         file_summary = mo.md("## File Summary\n" + "\n".join(summaries))
     else:
         file_summary = mo.md("*No files loaded yet*")
-    
+
     file_summary
     return
 
@@ -271,8 +281,10 @@ def _(file_configs, mo, combine_labels_from_configs):
         color_by_node_toggle = mo.ui.checkbox(value=False, label="Color by node")
 
         # Get summary of combined files
-        combined_summary = f"**Combined visualization from {len(file_configs)} file(s)**"
-        
+        combined_summary = (
+            f"**Combined visualization from {len(file_configs)} file(s)**"
+        )
+
         controls_panel = mo.vstack(
             [
                 mo.md(combined_summary),
@@ -311,7 +323,16 @@ def _(file_configs, mo, combine_labels_from_configs):
 
 
 @app.cell
-def _(color_by_node_toggle, create_frame_figure, frame_selector, viz_labels, mo, show_edges_toggle, show_image_toggle, show_labels_toggle):
+def _(
+    color_by_node_toggle,
+    create_frame_figure,
+    frame_selector,
+    viz_labels,
+    mo,
+    show_edges_toggle,
+    show_image_toggle,
+    show_labels_toggle,
+):
     # Initialize variables at the top
     plot_element = None
     viz_frame_idx = None
@@ -445,12 +466,12 @@ def _(mo, file_configs, detect_root_types):
         primary_icon = "✅" if root_types["primary"] else "❌"
         lateral_icon = "✅" if root_types["lateral"] else "❌"
         crown_icon = "✅" if root_types["crown"] else "❌"
-        
+
         root_types_text = "### Detected Root Types:\n"
         root_types_text += f"- **Primary roots**: {primary_icon}\n"
         root_types_text += f"- **Lateral roots**: {lateral_icon}\n"
         root_types_text += f"- **Crown roots**: {crown_icon}\n"
-        
+
         root_types_display = mo.md(root_types_text)
     else:
         root_types_display = mo.md("*No root types detected - load files above*")
@@ -508,7 +529,7 @@ def _(viz_labels, mo, save_all_button, save_all_frames):
     return
 
 
-@app.cell  
+@app.cell
 def _(mo, root_types, file_configs, get_compatible_pipelines):
     # Use the tested function to determine compatible pipelines
     compatible_pipelines = get_compatible_pipelines(root_types)
@@ -600,7 +621,18 @@ def _(file_configs, mo, get_videos_in_labels):
 
 
 @app.cell
-def _(file_configs, mo, roots_traits_button, Path, datetime, sleap_io, pipeline_selector, extract_video_name, compatible_pipelines, root_types):
+def _(
+    file_configs,
+    mo,
+    roots_traits_button,
+    Path,
+    datetime,
+    sleap_io,
+    pipeline_selector,
+    extract_video_name,
+    compatible_pipelines,
+    root_types,
+):
     # Handle SLEAP-roots traits button click - prefixed variables to avoid conflicts
     # Initialize traits_display at the top (similar to save_all_status pattern)
     new_traits_display = mo.md("")  # Default to empty
