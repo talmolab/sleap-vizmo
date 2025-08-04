@@ -45,6 +45,8 @@ from .sleap_roots_processing import (
     combine_trait_csvs,
     merge_traits_with_expected_counts,
     create_processing_summary,
+    save_notebook_snapshot,
+    save_pre_execution_snapshot,
 )
 
 __all__ = [
@@ -88,4 +90,6 @@ __all__ = [
     "combine_trait_csvs",
     "merge_traits_with_expected_counts",
     "create_processing_summary",
+    "save_notebook_snapshot",
+    "save_pre_execution_snapshot",
 ]
