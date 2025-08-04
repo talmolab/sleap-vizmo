@@ -83,7 +83,7 @@ def save_json(data: Any, filepath: Union[str, "Path"], indent: int = 2) -> None:
     filepath = Path(filepath)
     serializable_data = ensure_json_serializable(data)
 
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(serializable_data, f, indent=indent)
 
 

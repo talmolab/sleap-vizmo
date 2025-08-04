@@ -132,7 +132,7 @@ class TestSaveJson:
         assert json_path.exists()
 
         # Load and verify content
-        with open(json_path) as f:
+        with open(json_path, encoding="utf-8") as f:
             loaded = json.load(f)
 
         assert loaded["count"] == 42
@@ -146,7 +146,7 @@ class TestSaveJson:
 
         save_json(data, json_path, indent=4)
 
-        with open(json_path) as f:
+        with open(json_path, encoding="utf-8") as f:
             content = f.read()
 
         # Check that indentation is present
@@ -222,7 +222,7 @@ def test_sleap_roots_integration(complex_sleap_roots_data, tmp_path):
     save_json(complex_sleap_roots_data, json_path)
 
     # Verify we can load it back
-    with open(json_path) as f:
+    with open(json_path, encoding="utf-8") as f:
         loaded = json.load(f)
 
     assert loaded["series_name"] == "test_series"

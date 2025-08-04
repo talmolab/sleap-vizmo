@@ -322,7 +322,7 @@ class TestCreateProcessingSummary:
         assert summary_path.exists()
 
         # Verify it's valid JSON
-        with open(summary_path) as f:
+        with open(summary_path, encoding="utf-8") as f:
             loaded_summary = json.load(f)
         assert loaded_summary["timestamp"] == timestamp
 
@@ -366,7 +366,7 @@ class TestSaveNotebookSnapshot:
 
         # Create test notebook
         test_notebook = tmp_path / "test_notebook.ipynb"
-        with open(test_notebook, "w") as f:
+        with open(test_notebook, "w", encoding="utf-8") as f:
             json.dump(notebook_content, f)
 
         # Save snapshot
@@ -382,7 +382,7 @@ class TestSaveNotebookSnapshot:
         assert result.name == "sleap_roots_processing_notebook_snapshot.ipynb"
 
         # Verify content matches
-        with open(result) as f:
+        with open(result, encoding="utf-8") as f:
             saved_content = json.load(f)
         assert saved_content == notebook_content
 
@@ -468,7 +468,7 @@ class TestSaveNotebookSnapshot:
 
         # Create test notebook
         test_notebook = tmp_path / "test_notebook.ipynb"
-        with open(test_notebook, "w") as f:
+        with open(test_notebook, "w", encoding="utf-8") as f:
             json.dump(notebook_content, f)
 
         # Save snapshot

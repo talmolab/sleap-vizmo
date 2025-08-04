@@ -25,7 +25,7 @@ class TestExamples:
         assert demo_file.exists()
 
         # Check syntax by compiling
-        with open(demo_file, "r") as f:
+        with open(demo_file, "r", encoding="utf-8") as f:
             code = f.read()
 
         try:
@@ -39,7 +39,7 @@ class TestExamples:
         assert run_file.exists()
 
         # Check syntax by compiling
-        with open(run_file, "r") as f:
+        with open(run_file, "r", encoding="utf-8") as f:
             code = f.read()
 
         try:
@@ -53,7 +53,7 @@ class TestExamples:
         assert check_file.exists()
 
         # Check syntax by compiling
-        with open(check_file, "r") as f:
+        with open(check_file, "r", encoding="utf-8") as f:
             code = f.read()
 
         try:

@@ -173,7 +173,7 @@ def process_sleap_files(lateral_file, primary_file, output_dir=None):
         }
         
         summary_path = output_dir / "processing_summary.json"
-        with open(summary_path, 'w') as f:
+        with open(summary_path, 'w', encoding='utf-8') as f:
             json.dump(summary, f, indent=2)
         
         return final_csv_path
