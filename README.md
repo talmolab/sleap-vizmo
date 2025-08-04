@@ -17,6 +17,7 @@ Interactive visualization and analysis tool for SLEAP (Social LEAP Estimates Ani
 - **🎯 Frame Navigation**: Slider to navigate through labeled frames
 - **📈 Data Display**: Coordinate table showing all instances with video context
 - **💾 Batch Export**: One-click export of all frames as PNG, HTML, and CSV
+- **🌱 SLEAP-roots Integration**: Automatic pipeline detection and batch processing for plant root analysis
 
 ## 🚀 Quick Start
 
@@ -72,6 +73,8 @@ cd sleap-vizmo
 pip install -e ".[dev]"
 ```
 
+The development dependencies include all testing tools (pytest, black, ruff) and nbconvert for notebook HTML export.
+
 ### Testing
 
 ```bash
@@ -101,7 +104,11 @@ sleap-vizmo/
 │   ├── video_utils.py        # Video metadata extraction
 │   ├── plotting_utils.py     # Plotly visualization functions
 │   ├── data_utils.py         # Data export and analysis
-│   └── saving_utils.py       # Batch export functionality
+│   ├── saving_utils.py       # Batch export functionality
+│   ├── pipeline_utils.py     # SLEAP-roots pipeline detection
+│   ├── roots_utils.py        # SLEAP-roots Series compatibility
+│   ├── sleap_roots_processing.py  # SLEAP-roots batch processing
+│   └── json_utils.py         # JSON serialization utilities
 ├── tests/                    # Comprehensive test suite
 │   ├── conftest.py          # Shared fixtures
 │   ├── data/                # Test SLEAP files
@@ -125,6 +132,10 @@ The project follows a modular architecture:
 - **`plotting_utils`**: Creates Plotly visualizations with proper hover info
 - **`data_utils`**: Exports data to pandas DataFrames and CSV
 - **`saving_utils`**: Manages batch exports and file organization
+- **`pipeline_utils`**: Detects root types and suggests compatible SLEAP-roots pipelines
+- **`roots_utils`**: SLEAP-roots Series compatibility and file splitting utilities
+- **`sleap_roots_processing`**: Batch processing functions for SLEAP-roots analysis
+- **`json_utils`**: JSON serialization for numpy/pandas types
 
 ### Contributing
 
@@ -143,16 +154,66 @@ The project follows a modular architecture:
 - Add comprehensive tests for new features
 - Update CLAUDE.md if changing core behavior
 
+## 🌱 SLEAP-roots Integration
+
+SLEAP-Vizmo includes utilities for working with [SLEAP-roots](https://github.com/talmolab/sleap-roots), a plant root phenotyping package:
+
+### Root Type Detection
+The visualizer automatically detects root types (primary, lateral, crown) from loaded files and suggests compatible pipelines:
+
+- **Primary only** → PrimaryRootPipeline
+- **Lateral only** → LateralRootPipeline  
+- **Crown only** → OlderMonocotPipeline
+- **Primary + Lateral** → DicotPipeline or MultipleDicotPipeline
+- **Primary + Crown** → YoungerMonocotPipeline
+
+### Batch Processing
+Use the included utilities for SLEAP-roots batch analysis:
+
+```python
+from sleap_vizmo.roots_utils import split_labels_by_video, validate_series_compatibility
+from sleap_vizmo.sleap_roots_processing import create_expected_count_csv, combine_trait_csvs
+
+# Split multi-video labels for Series compatibility
+split_labels = split_labels_by_video(labels)
+
+# Validate Series requirements
+compatibility = validate_series_compatibility(labels)
+
+# Process with SLEAP-roots pipelines
+# See example notebooks for complete workflows
+```
+
+The processing workflow automatically saves:
+- Expected plant count CSV for pipeline configuration
+- Series summary statistics with all computed traits
+- Final merged CSV with metadata and traits
+- Processing summary JSON with complete metadata
+- **Notebook snapshots** before and after execution in both `.ipynb` and `.html` formats
+
+### Notebook Export
+The processing notebook is automatically saved at two points:
+1. **Before execution** (`sleap_roots_processing_notebook_before_execution.ipynb/html`) - captures the initial state
+2. **After execution** (`sleap_roots_processing_notebook_after_execution.ipynb/html`) - includes all outputs
+
+Each snapshot includes:
+- `.ipynb` format for editing and re-running
+- `.html` format for easy viewing by collaborators (no Jupyter required)
+
+Note: HTML export requires nbconvert, which is included in the development dependencies (`pip install -e ".[dev]"`).
+
 ## 📊 Data Formats
 
 ### Input
 - SLEAP files (`.slp`) containing pose annotations
 - Supports video backends and image sequences
+- Compatible with SLEAP-roots Series format requirements
 
 ### Output
 - **PNG**: High-resolution static images (1200x800px, 2x scale)
 - **HTML**: Interactive Plotly figures with zoom/pan
 - **CSV**: Instance coordinates with frame and video metadata
+- **SLEAP-roots**: Series-compatible split files and trait analysis CSVs
 
 ## 🐛 Troubleshooting
 
