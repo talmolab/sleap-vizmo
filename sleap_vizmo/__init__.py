@@ -20,6 +20,13 @@ from .saving_utils import (
     save_frame_plots,
     save_all_frames,
 )
+from .roots_utils import (
+    get_videos_in_labels,
+    split_labels_by_video,
+    save_individual_video_labels,
+    validate_series_compatibility,
+    create_series_name_from_video,
+)
 
 __all__ = [
     # video_utils
@@ -40,4 +47,10 @@ __all__ = [
     "create_output_directory",
     "save_frame_plots",
     "save_all_frames",
+    # roots_utils
+    "get_videos_in_labels",
+    "split_labels_by_video",
+    "save_individual_video_labels",
+    "validate_series_compatibility",
+    "create_series_name_from_video",
 ]
