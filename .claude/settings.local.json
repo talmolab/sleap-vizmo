@@ -73,7 +73,8 @@
       "Bash(pytest:*)",
       "Bash(ruff check:*)",
       "Bash(grep:*)",
-      "Bash(jupyter nbconvert:*)"
+      "Bash(jupyter nbconvert:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
