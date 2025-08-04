@@ -14,7 +14,7 @@ def test_data_dir():
 @pytest.fixture
 def test_sleap_file_path(test_data_dir):
     """Get path to the test SLEAP file."""
-    return test_data_dir / "lateral_root_MK22_Day14_test_labels.v003.slp"
+    return test_data_dir / "one_vid_lateral_root_MK22_Day14_test_labels.v003.slp"
 
 
 @pytest.fixture
