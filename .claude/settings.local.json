@@ -67,7 +67,9 @@
       "mcp__serena__insert_at_line",
       "Bash(claude doctor)",
       "Bash(npm i:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(git add:*)",
+      "Bash(git config:*)"
     ],
     "deny": []
   }
