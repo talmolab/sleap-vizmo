@@ -69,7 +69,10 @@
       "Bash(npm i:*)",
       "Bash(chmod:*)",
       "Bash(git add:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff check:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }
