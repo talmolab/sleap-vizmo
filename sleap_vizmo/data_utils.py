@@ -38,11 +38,11 @@ def extract_instance_data(
     # Process each instance
     for instance_idx, instance in enumerate(labeled_frame.instances):
         instance_points = instance.numpy()
-        
+
         # Skip if numpy() returns None
         if instance_points is None:
             continue
-            
+
         instance_skeleton = instance.skeleton
         instance_node_names = [node.name for node in instance_skeleton.nodes]
 
@@ -158,10 +158,20 @@ def summarize_labels(labels: Any) -> Dict[str, Any]:
         Dictionary with summary statistics
     """
     summary = {
-        "n_videos": len(labels.videos) if hasattr(labels, "videos") and labels.videos is not None else 0,
-        "n_skeletons": len(labels.skeletons) if hasattr(labels, "skeletons") and labels.skeletons is not None else 0,
+        "n_videos": (
+            len(labels.videos)
+            if hasattr(labels, "videos") and labels.videos is not None
+            else 0
+        ),
+        "n_skeletons": (
+            len(labels.skeletons)
+            if hasattr(labels, "skeletons") and labels.skeletons is not None
+            else 0
+        ),
         "n_labeled_frames": (
-            len(labels.labeled_frames) if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None else 0
+            len(labels.labeled_frames)
+            if hasattr(labels, "labeled_frames") and labels.labeled_frames is not None
+            else 0
         ),
         "n_tracks": (
             len(labels.tracks)

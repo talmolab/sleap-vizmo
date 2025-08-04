@@ -92,7 +92,7 @@ __all__ = [
     "validate_json_serializable",
     # utils
     "safe_len",
-    "safe_iter", 
+    "safe_iter",
     "has_valid_attr",
     "safe_get_attr",
     # sleap_roots_processing
