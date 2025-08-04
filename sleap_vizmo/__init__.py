@@ -39,6 +39,12 @@ from .json_utils import (
     save_json,
     validate_json_serializable,
 )
+from .utils import (
+    safe_len,
+    safe_iter,
+    has_valid_attr,
+    safe_get_attr,
+)
 from .sleap_roots_processing import (
     create_expected_count_csv,
     move_output_files_to_directory,
@@ -84,6 +90,11 @@ __all__ = [
     "ensure_json_serializable",
     "save_json",
     "validate_json_serializable",
+    # utils
+    "safe_len",
+    "safe_iter", 
+    "has_valid_attr",
+    "safe_get_attr",
     # sleap_roots_processing
     "create_expected_count_csv",
     "move_output_files_to_directory",
