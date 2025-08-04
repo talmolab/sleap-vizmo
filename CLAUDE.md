@@ -68,7 +68,7 @@ When contributing to Marimo apps:
 - **To display UI AND pass variables**: Place the UI element as the last expression, then use `return` for variables on the next line.
 - **For layout containers**: `mo.vstack([...])` or `mo.hstack([...])` should be the last expression to display.
 - **Use conditional logic**: Always ensure a UI element is displayed, even if it's just an explanatory message.
-- **IMPORTANT - Variable naming**: NEVER redefine variables that are already defined in other cells. This will cause "This cell redefines variables from other cells" errors. Each variable name must be unique across all cells unless you're importing it through the function signature.
+- **IMPORTANT - Variable naming**: NEVER redefine variables that are already defined in other cells. This will cause "This cell redefines variables from other cells" errors. Each variable name must be unique across all cells unless you're importing it through the function signature. This includes loop variables! Always prefix loop variables with context (e.g., `summary_config` instead of `config` in the summary cell, `root_type_config` instead of `config` in the root type cell).
 - **Button kinds**: When using `mo.ui.button()`, the `kind` parameter must be one of: `'neutral'`, `'success'`, `'warn'`, `'danger'`, `'info'`, or `'alert'`. Do NOT use `'primary'` or other values.
 
 Example patterns:
@@ -113,6 +113,32 @@ def __(frame_idx):  # Import frame_idx from the cell above
     # Use frame_idx here
     print(f"Frame index is {frame_idx}")
     return
+
+# INCORRECT - Loop variable conflicts
+@app.cell
+def __(file_configs):
+    for config in file_configs:  # 'config' used here
+        print(config)
+    return
+
+@app.cell
+def __(file_configs):
+    for config in file_configs:  # ERROR: 'config' redefined!
+        process(config)
+    return
+
+# CORRECT - Prefix loop variables with context
+@app.cell
+def __(file_configs):
+    for summary_config in file_configs:  # Prefixed with 'summary_'
+        print(summary_config)
+    return
+
+@app.cell
+def __(file_configs):
+    for process_config in file_configs:  # Different prefix
+        process(process_config)
+    return
 ```
 
 These patterns ensure the app renders properly in the Marimo notebook UI and avoids variable conflicts.
@@ -121,16 +147,64 @@ These patterns ensure the app renders properly in the Marimo notebook UI and avo
 
 To ensure clean execution and maintainability:
 
-- Avoid defining the same variable names in multiple cells unless intentionally reused (e.g., `labels`, `fig`).
-- Use descriptive or scoped names for loop variables and temporary values (e.g., `csv_node_name` instead of `node_name` when in the CSV export cell).
+- **NEVER** define the same variable names in multiple cells. Every variable must have a unique name across all cells.
+- **ALWAYS** use descriptive, context-prefixed names for ALL variables, especially loop variables:
+  - ❌ `for config in file_configs` (in multiple cells)
+  - ✅ `for summary_config in file_configs` (in summary cell)
+  - ✅ `for root_type_config in file_configs` (in root type cell)
+  - ✅ `for series_config in file_configs` (in series processing cell)
 - Only return values from cells if needed by other cells.
 - When returning UI elements and data, return them as tuples and avoid returning unused intermediate variables.
 - Refactor shared logic into functions to prevent code duplication and variable leaks.
-- When processing data in loops, prefix variable names with context (e.g., `csv_` prefix for CSV export loop variables).
-- **CRITICAL**: ALWAYS prefix ALL variable names in each cell with a unique context identifier (e.g., `table_backend_filename` in the table cell, `csv_backend_filename` in the CSV export cell). This applies to ALL variables, not just loop variables!
-- **Never access `.value` of a `mo.ui` element in the same cell where it is created**. Always access `.value` in a downstream cell. This prevents runtime errors like "RuntimeError: Accessing the value of a UIElement in the cell that created it is not allowed."
+- **CRITICAL**: ALWAYS prefix ALL variable names in each cell with a unique context identifier. This prevents "This cell redefines variables from other cells" errors!
+  - For error handling, use context-specific names: `save_all_error`, `save_all_error_details` in the save-all cell, `roots_error`, `roots_error_details` in the roots processing cell
+  - For loops, prefix the iterator: `for save_all_error in errors` not `for error in errors`
+  - This prevents "This cell redefines variables from other cells" errors
+- **CRITICAL - Never access `.value` of a `mo.ui` element in the same cell where it is created**. Always access `.value` in a downstream cell. This prevents runtime errors like "RuntimeError: Accessing the value of a UIElement in the cell that created it is not allowed."
+  ```python
+  # WRONG - Will cause RuntimeError
+  @app.cell
+  def __(mo):
+      checkbox = mo.ui.checkbox(value=True)
+      text_input = mo.ui.text(disabled=not checkbox.value)  # ERROR: accessing checkbox.value in same cell
+      return checkbox, text_input
+  
+  # CORRECT - Access .value in a different cell
+  @app.cell
+  def __(mo):
+      checkbox = mo.ui.checkbox(value=True)
+      return checkbox
+  
+  @app.cell
+  def __(mo, checkbox):
+      text_input = mo.ui.text(disabled=not checkbox.value)  # OK: checkbox is from another cell
+      return text_input
+  ```
 - **Never use UIElements in boolean contexts directly**. Always access `.value`. The truthiness of a UIElement is always True, which will trigger a warning: "The truth value of a UIElement is always True. You probably want to call `.value` instead."
 - **Button click handling**: For triggering computations like exports, use `mo.ui.run_button()` instead of `mo.ui.button()`. A run button's value is `True` when clicked and automatically resets to `False` after dependent cells execute. Check with `if button is not None and button.value:` to handle cases where the button might not exist. Never use the UIElement itself in a boolean context.
+  - **IMPORTANT**: When handling button clicks that generate output, do NOT use `mo.state()`. Instead, directly create and assign `mo.md()` elements for display:
+    ```python
+    # CORRECT pattern for button click handling
+    @app.cell 
+    def _(mo, button, some_function):
+        # Initialize display variable at the top
+        display_output = mo.md("")  # Default to empty
+        
+        if button is not None and button.value:
+            try:
+                results = some_function()
+                # Create display content directly
+                display_output = mo.md(f"✅ Success: {results}")
+            except Exception as e:
+                display_output = mo.md(f"❌ Error: {str(e)}")
+        
+        display_output  # Display the element
+        return
+    
+    # WRONG - Don't use mo.state() for display updates
+    status = mo.state([])  # This returns a tuple, not an object with set_value()
+    status.set_value(messages)  # This will fail with AttributeError
+    ```
 - **File export dependencies**: When exporting Plotly figures to images, ensure `plotly.io` is imported as `pio` and included in the cell's function parameters. Use `pio.write_image()` instead of `fig.write_image()` for more reliable exports.
 - **Import statements in cells**: When importing modules inside cells (especially in exception handlers), always use unique aliases to avoid variable redefinition errors. For example, use `import traceback as tb_png` in one cell and `import traceback as tb_csv` in another, rather than importing `traceback` in both cells.
 - **Progress tracking**: Use `mo.state()` for mutable values that need to be updated during computation. `mo.md()` objects are immutable and don't have an `update()` method. For progress tracking, create a state object with `progress_state = mo.state([])` and update it with `progress_state.set_value(new_list)`.
@@ -348,3 +422,66 @@ For labels to be compatible with SLEAP-roots Series:
 - Must have skeleton definitions
 - Tracks are recommended but not required
 - Single video per file is recommended (use `split_labels_by_video` for multi-video files)
+
+## Troubleshooting
+
+### Marimo IndentationError: "unexpected indent"
+
+**Problem**: When running `python -m marimo run sleap_viz.py`, you may encounter:
+```
+File "<unknown>", line 2
+    if file_configs:
+IndentationError: unexpected indent
+```
+
+**Cause**: This error can occur due to:
+1. **Multiline function definitions** in `@app.cell` decorators - Marimo may have trouble parsing function definitions split across multiple lines
+2. **Multiline f-strings** with triple quotes - Can cause parsing issues within cells
+3. **Line ending issues** - Mixed or Windows-style (CRLF) line endings can cause parsing problems
+
+**Solution**:
+1. **Convert multiline function definitions to single lines**:
+   ```python
+   # Instead of:
+   @app.cell
+   def _(
+       file_configs,
+       mo,
+       summarize_labels,
+   ):
+   
+   # Use:
+   @app.cell
+   def _(file_configs, mo, summarize_labels):
+   ```
+
+2. **Replace multiline f-strings with string concatenation**:
+   ```python
+   # Instead of:
+   summary_text = f"""
+   **{name}**
+   - Count: {count}
+   - Total: {total}
+   """
+   
+   # Use:
+   summary_text = f"**{name}**\n"
+   summary_text += f"- Count: {count}\n"
+   summary_text += f"- Total: {total}\n"
+   ```
+
+3. **Convert line endings to Unix-style (LF)**:
+   ```python
+   # Python script to fix line endings
+   with open('sleap_viz.py', 'rb') as f:
+       content = f.read()
+   content = content.replace(b'\r\n', b'\n')
+   with open('sleap_viz.py', 'wb') as f:
+       f.write(content)
+   ```
+
+**Prevention**: When writing Marimo cells:
+- Keep function definitions on a single line when possible
+- Avoid triple-quoted strings in cells; use string concatenation instead
+- Use consistent Unix-style (LF) line endings
+- If using very long parameter lists, consider grouping related parameters or using configuration objects
