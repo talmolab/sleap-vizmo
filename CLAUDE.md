@@ -17,7 +17,10 @@ sleap-vizmo/
 │   ├── plotting_utils.py     # Plotly visualization functions
 │   ├── data_utils.py         # Data export and analysis utilities
 │   ├── saving_utils.py       # Batch export and file management
-│   └── roots_utils.py        # SLEAP-roots Series compatibility utilities
+│   ├── roots_utils.py        # SLEAP-roots Series compatibility utilities
+│   ├── pipeline_utils.py     # SLEAP-roots pipeline detection and validation
+│   ├── sleap_roots_processing.py  # SLEAP-roots batch processing utilities
+│   └── json_utils.py         # JSON serialization for numpy/pandas types
 ├── tests/                    # Comprehensive pytest test suite
 │   ├── conftest.py          # Shared fixtures and test data
 │   ├── test_video_utils.py  # Tests for video utilities
@@ -302,6 +305,27 @@ output/
     └── labels_frames{N}_instances{M}.csv
 ```
 
+For SLEAP-roots processing workflows, the output directory includes:
+```
+output/
+└── output_YYYYMMDD_HHMMSS_ffffff/
+    ├── expected_plant_counts.csv
+    ├── series_summary_statistics_*.csv
+    ├── final_series_summary_with_metadata_*.csv
+    ├── all_series_traits.json
+    ├── processing_summary.json
+    ├── sleap_roots_processing_notebook_before_execution.ipynb
+    ├── sleap_roots_processing_notebook_before_execution.html
+    ├── sleap_roots_processing_notebook_after_execution.ipynb
+    └── sleap_roots_processing_notebook_after_execution.html
+```
+
+The notebook is saved at two points:
+1. **Before execution** - captures the initial notebook state
+2. **After execution** - includes all outputs and results
+
+Each snapshot is saved in both `.ipynb` and `.html` formats. The HTML version is viewable by anyone without needing Jupyter installed. HTML export requires nbconvert, which is included in the dev dependencies.
+
 The microsecond precision in timestamps ensures unique directory names even for rapid consecutive exports.
 
 ## Save-All Export Logic
@@ -366,11 +390,15 @@ The project uses GitHub Actions for continuous integration:
 - Added badges for CI status and PyPI
 - Updated installation and usage instructions
 
-### SLEAP-roots Compatibility (January 2025)
+### SLEAP-roots Integration (January 2025)
 - Added `roots_utils.py` module for SLEAP-roots Series compatibility
+- Added `pipeline_utils.py` for automatic root type detection and pipeline suggestions
+- Added `sleap_roots_processing.py` for batch processing workflows
+- Added `json_utils.py` for JSON serialization of numpy/pandas types
 - Functions to split multi-video labels into individual files
 - Series compatibility validation
-- Comprehensive test coverage (99% for roots_utils)
+- Notebook snapshot functionality - saves before and after execution states
+- Comprehensive test coverage (95% overall)
 
 ## SLEAP-roots Integration
 
@@ -422,6 +450,19 @@ For labels to be compatible with SLEAP-roots Series:
 - Must have skeleton definitions
 - Tracks are recommended but not required
 - Single video per file is recommended (use `split_labels_by_video` for multi-video files)
+
+## Cross-Platform Development
+
+### Git Line Endings Configuration
+
+The repository includes a `.gitattributes` file to ensure consistent line endings across platforms:
+- Python files use LF (Unix) line endings
+- This prevents line ending conflicts between Windows/Mac/Linux developers
+- Git automatically handles conversions based on platform
+
+Configure your local git:
+- **Windows**: `git config --global core.autocrlf true`
+- **Mac/Linux**: `git config --global core.autocrlf input`
 
 ## Troubleshooting
 
